@@ -1,0 +1,6 @@
+FROM ubuntu 
+
+RUN apt update && apt upgrade -y
+
+RUN apt install dnsutils curl -y
+

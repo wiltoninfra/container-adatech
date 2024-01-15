@@ -1,0 +1,50 @@
+# Versão do docker compose
+version: "3.8"
+
+# Inicia os serviços do container
+services: 
+
+  wordpress: 
+    # Caracteristicas do container
+    container_name: wordpress
+    build: 
+      # Contexto do dockerfile (caminho)
+      context: ./wordpress
+      # Nome do dockerfile
+      dockerfile: Dockerfile-wordpress
+    #image: wordpress
+    # Variaveis de ambiente
+    environment:
+      - WORDPRESS_DB_PASSWORD=123456
+      - WORDPRESS_DB_USER=root
+      - WORDPRESS_DB_HOST=database 
+      - WORDPRESS_DB_NAME=wordpress
+    # Portas que serão expostas myhost:container  
+    ports:
+      - 8088:80
+    # Volumes que serão criados  
+    volumes:
+      - html:/var/www/html
+    # Links para o container database  
+    links: 
+      - database
+
+  database:
+    container_name: database
+    image: wilton/mariadb:v1-adatech
+    command: '--default-authentication-plugin=mysql_native_password'
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=wordpress 
+    volumes:
+      - database:/var/lib/mysql
+    expose:
+      - 3306
+    ports:
+      - 3306:3306
+
+volumes: 
+  database:
+    driver: local
+  html:
+    driver: local
