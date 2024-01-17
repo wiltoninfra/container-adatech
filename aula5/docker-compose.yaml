@@ -6,18 +6,89 @@ services:
     build: 
       context: ./frontend
       dockerfile: Dockerfile 
-    container_name: frontend 
+    container_name: frontend
+    environment:
+      - DATABASE_HOST=database
+      - DATABASE_NAME=postgres
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    volumes: 
+      - ./frontend:/usr/local/app      
+    ports: 
+      - "5001:80"
+      - "127.0.0.1:9229:9229"
+    networks:
+      - backend 
 
   api: 
     build: 
       context: ./api 
       dockerfile: Dockerfile
     container_name: api
+    healthcheck:
+       test: ["CMD", "curl", "-f", "http://localhost"]
+       interval: 15s
+       timeout: 10s
+       retries: 3
+       start_period: 10s
+    environment:
+      - REDIS_HOST=""
+    ports:  
+      - "5002:80"
+    networks:
+      - backend
 
-  database: {}
+  database:
+    container_name: database
+    image: postgres:15-alpine
+    environment: 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres 
+    volumes: 
+      - "db-data:/var/lib/postgresql/data"
+      - "./utils/healthchecks:/healthchecks"
+    healthcheck:
+      test: "/healthchecks/postgres.sh"
+      interval: "5s"
+    ports: 
+      - "5435:5432"
+    networks:
+      - backend
 
-  cached: {} 
+  cached: 
+    container_name: cached
+    build:
+      context: ./cached
+      dockerfile: Dockerfile
+    volumes: 
+      - ./utils/healthchecks:/healthchecks
+    healthcheck:
+      test: /healthchecks/redis.sh
+      interval: 5s
+    networks:
+      - backend  
   
-       
+  worker:
+    container_name: worker
+    build: ./worker
+    depends_on: 
+      cached:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    networks:
+      - backend
 
-    
+volumes: 
+   db-data:    
+
+networks:
+  backend: 
+  frontend:
