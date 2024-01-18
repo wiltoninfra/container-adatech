@@ -8,11 +8,12 @@ services:
       dockerfile: Dockerfile 
     container_name: frontend
     environment:
-      - DATABASE_HOST=database
-      - DATABASE_NAME=postgres
+      DATABASE_HOST: database
+      DATABASE_NAME: postgres
     depends_on:
       database:
         condition: service_healthy
+    entrypoint: nodemon --inspect=0.0.0.0 server.js    
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 15s
@@ -20,7 +21,7 @@ services:
       retries: 3
       start_period: 10s
     volumes: 
-      - ./frontend:/usr/local/app      
+      - ./frontend:/usr/local/app  
     ports: 
       - "5001:80"
       - "127.0.0.1:9229:9229"
@@ -39,7 +40,7 @@ services:
        retries: 3
        start_period: 10s
     environment:
-      - REDIS_HOST=""
+      REDIS_HOST: cached
     ports:  
       - "5002:80"
     networks:
@@ -62,6 +63,17 @@ services:
     networks:
       - backend
 
+  worker:
+    container_name: worker
+    build: ./worker
+    depends_on: 
+      #cached:
+      #  condition: service_healthy
+      database:
+        condition: service_healthy
+    networks:
+      - backend
+
   cached: 
     container_name: cached
     build:
@@ -75,17 +87,6 @@ services:
     networks:
       - backend  
   
-  worker:
-    container_name: worker
-    build: ./worker
-    depends_on: 
-      cached:
-        condition: service_healthy
-      database:
-        condition: service_healthy
-    networks:
-      - backend
-
 volumes: 
    db-data:    
 
