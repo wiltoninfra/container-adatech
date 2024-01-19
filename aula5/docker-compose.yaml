@@ -2,6 +2,23 @@ version: "3.8"
 
 services: 
 
+  loadbalancer: 
+    image: traefik 
+    container_name: loadbalancer
+    command: 
+      - "--api.insecure=true" 
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports: 
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - backend 
+      - frontend   
+
   frontend: 
     build: 
       context: ./frontend
@@ -27,6 +44,12 @@ services:
       - "127.0.0.1:9229:9229"
     networks:
       - backend 
+      - frontend
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`frontend.vote.local`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      #- "traefik.http.services.frontend.loadbalancer.server.port=80"
 
   api: 
     build: 
@@ -45,6 +68,7 @@ services:
       - "5002:80"
     networks:
       - backend
+      - frontend
 
   database:
     container_name: database
@@ -86,7 +110,18 @@ services:
       interval: 5s
     networks:
       - backend  
-  
+
+  seed: 
+    container_name: seed 
+    build: 
+      context: ./utils/seed
+      dockerfile: Dockerfile
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - backend      
+
 volumes: 
    db-data:    
 
