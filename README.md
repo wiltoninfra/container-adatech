@@ -1,9 +1,14 @@
 
 # Docker comandos básicos
 
+### Cursos gratuitos AdaTech 
+https://ada.tech/
+
 ### Pré requisitos
 - Comandos básicos linux
 - Sistemas operacionais
+
+
   
 > Documentação oficial do docker com todas as linhas de comandos seus argumentos e parâmetros
 https://docs.docker.com/engine/reference/commandline/docker/
