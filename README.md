@@ -11,6 +11,13 @@ https://training.play-with-docker.com/ \
 https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
 
 
+### Livros
+- Descomplicando o Docker
+- Containers com Docker: Do desenvolvimento à produção
+- Do zero ao Docker: Guia básico referencial de instalação, uso e segurança no uso de containers em Docker para iniciantes
+- Docker: Up & Running: Shipping Reliable Containers in Production (English Edition / Advanced)
+
+
 ### Pré requisitos
 - Comandos básicos linux
 - Sistemas operacionais
