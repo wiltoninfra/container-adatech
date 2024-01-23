@@ -4,10 +4,16 @@
 ### Cursos gratuitos AdaTech 
 https://ada.tech/
 
+### Links úteis
+https://docs.docker.com/get-started/docker_cheatsheet.pdf \
+https://labs.play-with-docker.com/ \
+https://training.play-with-docker.com/ \
+https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
+
+
 ### Pré requisitos
 - Comandos básicos linux
 - Sistemas operacionais
-
 
   
 > Documentação oficial do docker com todas as linhas de comandos seus argumentos e parâmetros
