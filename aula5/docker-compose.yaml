@@ -18,8 +18,13 @@ services:
     networks:
       - backend 
       - frontend   
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.rule=Host(`localhost`)
+      - traefik.http.routers.dashboard.middlewares=auth
+      - "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
 
-  frontend: 
+  frontend:
     build: 
       context: ./frontend
       dockerfile: Dockerfile 
@@ -121,6 +126,20 @@ services:
         condition: service_healthy
     networks:
       - backend      
+
+  portainer: 
+    container_name: portainer
+    image: portainer/portainer-ce:alpine
+    command: -H unix:///var/run/docker.sock
+    ports: 
+      - "9000:9000"
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
+      #- portainer_data:/data
+    restart: always
+    networks:
+      - backend
+      - frontend    
 
 volumes: 
    db-data:    
