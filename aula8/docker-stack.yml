@@ -1,0 +1,122 @@
+version: "3.8"
+
+services: 
+
+  frontend:
+    image: wilton/frontend
+    environment:
+      DATABASE_HOST: database
+      DATABASE_NAME: postgres
+    entrypoint: nodemon --inspect=0.0.0.0 server.js    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    ports: 
+      - "5001:80"
+    networks:
+      - backend 
+      - frontend
+    deploy:
+      replicas: 10
+      labels: [APP=VOTING]
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M      
+      update_config:
+        parallelism: 2
+        delay: 10s
+        #order: start-first
+      restart_policy:
+        condition: on-failure
+
+  api: 
+    image: wilton/api
+    environment:
+      REDIS_HOST: cached
+    depends_on:
+      - cached
+    ports:  
+      - "5002:80"
+    networks:
+      - backend
+      - frontend
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 128M      
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 2
+      placement:
+        constraints: [node.role == worker]
+
+  worker:
+    image: wilton/worker
+    networks:
+      - backend
+      - frontend
+    deploy:
+      replicas: 2
+      labels: [APP=VOTING]
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M      
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 2
+      placement:
+        constraints: [node.role == manager]
+
+  cached: 
+    image: redis:alpine
+    ports:
+      - "6379"
+    networks:
+      - frontend    
+    deploy:
+      replicas: 2    
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+      placement:
+        constraints: [node.role == manager]
+        
+  database:
+    image: postgres:15-alpine
+    environment: 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres 
+    volumes: 
+      - "db-data:/var/lib/postgresql/data"
+    ports: 
+      - "5435:5432"
+    networks:
+      - backend
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+volumes: 
+   db-data:    
+
+networks:
+  backend: 
+  frontend:
