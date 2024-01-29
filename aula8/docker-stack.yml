@@ -3,7 +3,7 @@ version: "3.8"
 services: 
 
   frontend:
-    image: wilton/frontend
+    image: wilton/frontend:20240122201001
     environment:
       DATABASE_HOST: database
       DATABASE_NAME: postgres
@@ -20,7 +20,7 @@ services:
       - backend 
       - frontend
     deploy:
-      replicas: 10
+      replicas: 1
       labels: [APP=VOTING]
       resources:
         limits:
@@ -28,13 +28,11 @@ services:
           memory: 50M      
       update_config:
         parallelism: 2
-        delay: 10s
-        #order: start-first
       restart_policy:
         condition: on-failure
 
   api: 
-    image: wilton/api
+    image: wilton/api:20240122201001
     environment:
       REDIS_HOST: cached
     depends_on:
@@ -61,7 +59,7 @@ services:
         constraints: [node.role == worker]
 
   worker:
-    image: wilton/worker
+    image: wilton/worker:20240124175900
     networks:
       - backend
       - frontend
@@ -89,7 +87,7 @@ services:
     networks:
       - frontend    
     deploy:
-      replicas: 2    
+      replicas: 1    
       update_config:
         parallelism: 2
         delay: 10s

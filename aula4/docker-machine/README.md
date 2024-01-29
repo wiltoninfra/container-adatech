@@ -1,4 +1,4 @@
-## Docker Machine
+## Docker Machine in Amazon EC2
 
 ### Pré requisitos
 

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-echo "node1" > /etc/hostname
 sudo yum update
 sudo yum upgrade -y
 sudo yum install docker -y

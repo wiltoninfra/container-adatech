@@ -14,16 +14,6 @@ resource "aws_instance" "docker-machine" {
 #!/bin/bash
 hostname "adatech-${count.index + 1}"
 echo "adatech-${count.index + 1}" > /etc/hostname
-sudo yum update
-sudo yum upgrade -y
-sudo yum install docker -y
-sudo usermod -a -G docker ec2-user
-sudo yum install python3-pip git -y
-sudo pip3 install docker-compose
-pip3 install --user docker-compose
-sudo systemctl enable docker.service
-sudo systemctl start docker.service
-echo "Docker instalado com sucesso!"  
 EOF
   ebs_block_device {
     device_name = "/dev/sda1"

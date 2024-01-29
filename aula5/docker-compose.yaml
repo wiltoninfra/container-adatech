@@ -25,9 +25,7 @@ services:
       - "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
 
   frontend:
-    build: 
-      context: ./frontend
-      dockerfile: Dockerfile 
+    image: wilton/frontend:12313213
     container_name: frontend
     environment:
       DATABASE_HOST: database
@@ -102,6 +100,22 @@ services:
         condition: service_healthy
     networks:
       - backend
+    deploy:
+      replicas: 2
+      labels: [APP=VOTING]
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M      
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 2
+      placement:
+        constraints: [node.role == manager]
 
   cached: 
     container_name: cached

@@ -22,7 +22,6 @@ https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
 - Comandos básicos linux
 - Sistemas operacionais
 
-  
 > Documentação oficial do docker com todas as linhas de comandos seus argumentos e parâmetros
 https://docs.docker.com/engine/reference/commandline/docker/
 

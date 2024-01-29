@@ -1,5 +1,7 @@
 FROM node:18-slim
 
+USER root
+
 # add curl for healthcheck
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl tini && \
@@ -17,9 +19,12 @@ RUN npm ci && \
  mv /usr/local/app/node_modules /node_modules
 
 COPY . .
+ADD ./server.js ./frontend.js
 
 ENV PORT 80
 EXPOSE 80
+
+USER prometheus
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["node", "server.js"]
